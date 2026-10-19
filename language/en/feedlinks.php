@@ -22,8 +22,9 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, [
-	'FEEDLINKS_SUBSCRIBE'	=> 'Subscribe to the feed:',
-	'FEEDLINKS_OR'			=> 'or',
+	// %s, %1$s and %2$s are the feed links, for example "Atom"
+	'FEEDLINKS_AVAILABLE'		=> 'Subscribe to the feed, available in %s format.',
+	'FEEDLINKS_AVAILABLE_BOTH'	=> 'Subscribe to the feed, available in %1$s or %2$s format.',
 	'FEEDLINKS_ATOM'		=> 'Atom',
 	'FEEDLINKS_RSS'			=> 'RSS',
 	'FEEDLINKS_ATOM_TITLE'	=> 'Atom feed - %s',

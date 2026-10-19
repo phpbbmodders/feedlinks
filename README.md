@@ -8,7 +8,7 @@ Adds RSS 2.0 versions of phpBB's Atom feeds and shows Atom, RSS or both feed lin
 
 - **RSS 2.0 feeds** for every feed phpBB offers as Atom: the board, a forum, a topic, news, all forums, new topics and active topics. They follow phpBB's own feed settings and permissions; a feed that is off or not allowed in Atom is off or not allowed in RSS too.
 - A **Show feed links** setting for each forum (**ACP → Forums → Edit forum**): none, Atom, RSS, or both. New forums start with none.
-- The links show below the forum's description on the board index and in subforum lists, and on the forum's own page: "Subscribe to the feed: Atom or RSS".
+- The links show below the forum's description on the board index and in subforum lists, and on the forum's own page: "Subscribe to the feed, available in Atom or RSS format", as on phpBB.com.
 - Links only show when the feed works for the viewer: forum feeds on, the forum not excluded from feeds, no forum password, and the viewer can read the forum.
 - Adds the forum's and topic's RSS feeds to the page head, next to phpBB's Atom ones, so browsers and feed readers can find them. A setting under **ACP → Feed settings** adds the board-wide RSS feeds there too.
 - phpBB's HTTP authentication for feeds works for the RSS feeds as well.

@@ -4,9 +4,14 @@
 	display: block;
 }
 
+.feedlinks-link {
+	text-decoration: underline dotted;
+	text-underline-offset: 2px;
+}
+
 .feedlinks-icon {
 	vertical-align: -2px;
-	margin-right: 2px;
+	margin-right: 3px;
 }
 
 .feedlinks-forum {
