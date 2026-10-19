@@ -119,7 +119,7 @@ class listener implements EventSubscriberInterface
 		$forum_row = $event['forum_row'];
 		$forum_row['U_FEEDLINKS_ATOM'] = $urls['atom'];
 		$forum_row['U_FEEDLINKS_RSS'] = $urls['rss'];
-		$forum_row['FORUM_DESC'] .= $this->render_links($urls, $event['row']['forum_name'], true);
+		$forum_row['FORUM_DESC'] .= $this->render_links($urls, $event['row']['forum_name'], true, $forum_row['FORUM_DESC'] !== '');
 		$event['forum_row'] = $forum_row;
 	}
 
@@ -260,9 +260,11 @@ class listener implements EventSubscriberInterface
 	 * @param array $urls ['atom' => URL or '', 'rss' => URL or '']
 	 * @param string $forum_name Forum name, already escaped
 	 * @param bool $in_list Whether the links go in a forum list row
+	 * @param bool $new_line Whether to start a new line first, after the
+	 *                       description
 	 * @return string HTML
 	 */
-	protected function render_links(array $urls, $forum_name, $in_list)
+	protected function render_links(array $urls, $forum_name, $in_list, $new_line = false)
 	{
 		if (!$this->language_loaded)
 		{
@@ -275,6 +277,7 @@ class listener implements EventSubscriberInterface
 			'U_RSS'			=> $urls['rss'],
 			'FORUM_NAME'	=> $forum_name,
 			'S_IN_LIST'		=> $in_list,
+			'S_NEW_LINE'	=> $new_line,
 		]);
 	}
 }

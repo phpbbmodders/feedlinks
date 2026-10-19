@@ -1,11 +1,7 @@
 /* Feed Links: a forum's Atom/RSS links on forum lists and forum pages */
 
-.feedlinks {
+.feedlinks-page {
 	display: block;
-}
-
-.feedlinks-list {
-	margin-top: 2px;
 }
 
 .feedlinks-icon {

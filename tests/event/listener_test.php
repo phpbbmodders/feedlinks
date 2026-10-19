@@ -111,6 +111,7 @@ class listener_test extends \phpbb_test_case
 				'U_RSS'			=> '',
 				'FORUM_NAME'	=> 'Forum',
 				'S_IN_LIST'		=> true,
+				'S_NEW_LINE'	=> true,
 			])
 			->willReturn('<links>');
 
