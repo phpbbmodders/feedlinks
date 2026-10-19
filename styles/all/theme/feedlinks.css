@@ -1,0 +1,18 @@
+/* Feed Links: a forum's Atom/RSS links on forum lists and forum pages */
+
+.feedlinks {
+	display: block;
+}
+
+.feedlinks-list {
+	margin-top: 2px;
+}
+
+.feedlinks-icon {
+	vertical-align: -2px;
+	margin-right: 2px;
+}
+
+.feedlinks-forum {
+	margin: 0 0 8px;
+}

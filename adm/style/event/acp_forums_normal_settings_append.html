@@ -1,0 +1,10 @@
+		<dl>
+			<dt><label for="forum_feedlinks">{{ lang('FEEDLINKS_FORUM') ~ lang('COLON') }}</label><br /><span>{{ lang('FEEDLINKS_FORUM_EXPLAIN') }}</span></dt>
+			<dd>
+				<select id="forum_feedlinks" name="forum_feedlinks">
+					{% for option in loops.feedlinks_options %}
+						<option value="{{ option.VALUE }}"{% if option.S_CHECKED %} selected="selected"{% endif %}>{{ option.LABEL }}</option>
+					{% endfor %}
+				</select>
+			</dd>
+		</dl>

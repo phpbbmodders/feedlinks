@@ -1,0 +1,37 @@
+services:
+    # phpBB's own feed controller with RSS output. The parent definition gives
+    # it the same arguments as core's controller on every phpBB version.
+    phpbbmodders.feedlinks.controller.rss:
+        class: phpbbmodders\feedlinks\controller\rss
+        parent: phpbb.feed.controller
+        calls:
+            - [set_converter, ['@phpbbmodders.feedlinks.atom_to_rss']]
+
+    phpbbmodders.feedlinks.atom_to_rss:
+        class: phpbbmodders\feedlinks\atom_to_rss
+
+    phpbbmodders.feedlinks.links:
+        class: phpbbmodders\feedlinks\links
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@controller.helper'
+
+    # phpBB's HTTP authentication for feeds, applied to the RSS routes too
+    phpbbmodders.feedlinks.http_auth_subscriber:
+        class: phpbbmodders\feedlinks\event\http_auth_subscriber
+        parent: feed.http_auth_subscriber
+        tags:
+            - { name: kernel.event_subscriber }
+
+    phpbbmodders.feedlinks.listener:
+        class: phpbbmodders\feedlinks\event\listener
+        arguments:
+            - '@config'
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@template.twig.environment'
+            - '@phpbbmodders.feedlinks.links'
+        tags:
+            - { name: event.listener }
