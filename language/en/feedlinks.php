@@ -29,4 +29,5 @@ $lang = array_merge($lang, [
 	'FEEDLINKS_RSS'			=> 'RSS',
 	'FEEDLINKS_ATOM_TITLE'	=> 'Atom feed - %s',
 	'FEEDLINKS_RSS_TITLE'	=> 'RSS feed - %s',
+	'FEEDLINKS_RSS_ERROR'	=> 'The RSS feed could not be created.',
 ]);

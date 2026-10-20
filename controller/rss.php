@@ -10,6 +10,7 @@
 
 namespace phpbbmodders\feedlinks\controller;
 
+use phpbb\exception\http_exception;
 use phpbb\feed\feed_interface;
 use phpbbmodders\feedlinks\atom_to_rss;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,12 +46,22 @@ class rss extends \phpbb\feed\controller\feed
 	 *
 	 * @param feed_interface $feed
 	 * @return Response
+	 * @throws http_exception When phpBB's feed can't be converted
 	 */
 	protected function send_feed_do(feed_interface $feed)
 	{
 		$response = parent::send_feed_do($feed);
 
-		$response->setContent($this->converter->convert($response->getContent()));
+		try
+		{
+			$response->setContent($this->converter->convert($response->getContent()));
+		}
+		catch (\RuntimeException $e)
+		{
+			$this->language->add_lang('feedlinks', 'phpbbmodders/feedlinks');
+			throw new http_exception(Response::HTTP_INTERNAL_SERVER_ERROR, 'FEEDLINKS_RSS_ERROR', [], $e);
+		}
+
 		$response->headers->set('Content-Type', 'application/rss+xml; charset=UTF-8');
 
 		return $response;

@@ -3,8 +3,8 @@
    links follow the description inline, after a line break (S_NEW_LINE) when there is one, as the moderators
    and subforums lines do. #}
 {% set feedlinks_icon %}<svg class="feedlinks-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect width="16" height="16" rx="3" fill="#f26522"/><circle cx="4.5" cy="11.5" r="1.6" fill="#fff"/><path d="M3 7.1a5.9 5.9 0 0 1 5.9 5.9h-1.9A4 4 0 0 0 3 9zM3 3.4a9.6 9.6 0 0 1 9.6 9.6h-1.9A7.7 7.7 0 0 0 3 5.3z" fill="#fff"/></svg>{% endset %}
-{% set feedlinks_atom %}{% if U_ATOM %}<a class="feedlinks-link" href="{{ U_ATOM }}" type="application/atom+xml" title="{{ lang('FEEDLINKS_ATOM_TITLE', FORUM_NAME) }}">{{ feedlinks_icon }}{{ lang('FEEDLINKS_ATOM') }}<span class="sr-only"> – {{ FORUM_NAME }}</span></a>{% endif %}{% endset %}
-{% set feedlinks_rss %}{% if U_RSS %}<a class="feedlinks-link" href="{{ U_RSS }}" type="application/rss+xml" title="{{ lang('FEEDLINKS_RSS_TITLE', FORUM_NAME) }}">{{ feedlinks_icon }}{{ lang('FEEDLINKS_RSS') }}<span class="sr-only"> – {{ FORUM_NAME }}</span></a>{% endif %}{% endset %}
+{% set feedlinks_atom %}{% if U_ATOM %}<a class="feedlinks-link" href="{{ U_ATOM }}" type="application/atom+xml" title="{{ lang('FEEDLINKS_ATOM_TITLE')|e|format(FORUM_NAME) }}">{{ feedlinks_icon }}{{ lang('FEEDLINKS_ATOM') }}<span class="sr-only"> – {{ FORUM_NAME }}</span></a>{% endif %}{% endset %}
+{% set feedlinks_rss %}{% if U_RSS %}<a class="feedlinks-link" href="{{ U_RSS }}" type="application/rss+xml" title="{{ lang('FEEDLINKS_RSS_TITLE')|e|format(FORUM_NAME) }}">{{ feedlinks_icon }}{{ lang('FEEDLINKS_RSS') }}<span class="sr-only"> – {{ FORUM_NAME }}</span></a>{% endif %}{% endset %}
 {% if S_NEW_LINE %}<br />{% endif %}<span class="feedlinks{% if S_IN_LIST %} feedlinks-list{% else %} feedlinks-page{% endif %}">
 	{%- if U_ATOM and U_RSS -%}
 		{{ lang('FEEDLINKS_AVAILABLE_BOTH', feedlinks_atom, feedlinks_rss) }}

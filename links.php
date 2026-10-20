@@ -19,6 +19,9 @@ use phpbb\controller\helper;
  */
 class links
 {
+	/** Forum setting: show no links */
+	const NONE = 0;
+
 	/** Forum setting bit: show the Atom link */
 	const ATOM = 1;
 
@@ -59,11 +62,11 @@ class links
 	 *
 	 * @param array $forum Forum row with forum_id, forum_type, forum_options,
 	 *                     forum_password and forum_feedlinks
-	 * @return int Bits of self::ATOM and self::RSS; 0 for no links
+	 * @return int Bits of self::ATOM and self::RSS; self::NONE for no links
 	 */
 	public function get_formats(array $forum)
 	{
-		$formats = isset($forum['forum_feedlinks']) ? ((int) $forum['forum_feedlinks'] & self::BOTH) : 0;
+		$formats = isset($forum['forum_feedlinks']) ? ((int) $forum['forum_feedlinks'] & self::BOTH) : self::NONE;
 
 		if (!$formats
 			|| !$this->config['feed_enable']
@@ -73,7 +76,7 @@ class links
 			|| !empty($forum['forum_password'])
 			|| !$this->auth->acl_get('f_read', (int) $forum['forum_id']))
 		{
-			return 0;
+			return self::NONE;
 		}
 
 		return $formats;

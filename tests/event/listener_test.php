@@ -121,11 +121,7 @@ class listener_test extends \phpbb_test_case
 		]);
 		$this->get_listener()->add_forumlist_links($event);
 
-		$this->assertSame([
-			'FORUM_DESC'		=> 'Description<links>',
-			'U_FEEDLINKS_ATOM'	=> 'atom-url',
-			'U_FEEDLINKS_RSS'	=> '',
-		], $event['forum_row']);
+		$this->assertSame(['FORUM_DESC' => 'Description<links>'], $event['forum_row']);
 	}
 
 	public function test_forumlist_without_links()
