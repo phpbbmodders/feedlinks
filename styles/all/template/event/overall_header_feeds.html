@@ -1,0 +1,9 @@
+{% if S_FEEDLINKS_RSS_HEAD %}
+	{% if S_ENABLE_FEEDS_OVERALL %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ SITENAME }}" href="{{ path('phpbbmodders_feedlinks_rss_overall') }}">{% endif %}
+	{% if S_ENABLE_FEEDS_NEWS %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('FEED_NEWS') }}" href="{{ path('phpbbmodders_feedlinks_rss_news') }}">{% endif %}
+	{% if S_ENABLE_FEEDS_FORUMS %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('ALL_FORUMS') }}" href="{{ path('phpbbmodders_feedlinks_rss_forums') }}">{% endif %}
+	{% if S_ENABLE_FEEDS_TOPICS %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('FEED_TOPICS_NEW') }}" href="{{ path('phpbbmodders_feedlinks_rss_topics') }}">{% endif %}
+	{% if S_ENABLE_FEEDS_TOPICS_ACTIVE %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('FEED_TOPICS_ACTIVE') }}" href="{{ path('phpbbmodders_feedlinks_rss_topics_active') }}">{% endif %}
+{% endif %}
+{% if U_FEEDLINKS_RSS %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('FORUM') }} - {{ FORUM_NAME }}" href="{{ U_FEEDLINKS_RSS }}">{% endif %}
+{% if U_FEEDLINKS_RSS_TOPIC_HEAD %}<link rel="alternate" type="application/rss+xml" title="{{ lang('FEED') }} (RSS) - {{ lang('TOPIC') }} - {{ TOPIC_TITLE }}" href="{{ U_FEEDLINKS_RSS_TOPIC_HEAD }}">{% endif %}

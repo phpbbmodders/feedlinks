@@ -1,0 +1,38 @@
+# RSS versions of phpBB's Atom feed routes (app.php/feed/...). Each one runs
+# the core controller action of the same name, so the feed settings in
+# ACP > Feed settings apply to both formats.
+phpbbmodders_feedlinks_rss_forums:
+    path: /rss/forums
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:forums }
+
+phpbbmodders_feedlinks_rss_news:
+    path: /rss/news
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:news }
+
+phpbbmodders_feedlinks_rss_topics:
+    path: /rss/topics
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:topics }
+
+phpbbmodders_feedlinks_rss_topics_active:
+    path: /rss/topics_active
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:topics_active }
+
+phpbbmodders_feedlinks_rss_topics_new:
+    path: /rss/topics_new
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:topics_new }
+
+phpbbmodders_feedlinks_rss_forum:
+    path: /rss/forum/{forum_id}
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:forum }
+    requirements:
+        forum_id: \d+
+
+phpbbmodders_feedlinks_rss_topic:
+    path: /rss/topic/{topic_id}
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:topic }
+    requirements:
+        topic_id: \d+
+
+phpbbmodders_feedlinks_rss_overall:
+    path: /rss
+    defaults: { _controller: phpbbmodders.feedlinks.controller.rss:overall }
