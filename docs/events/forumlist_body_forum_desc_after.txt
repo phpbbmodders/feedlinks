@@ -40,8 +40,8 @@ not the forum has a description, moderators or subforums.
 USE CASE
 ========
 phpbbmodders/feedlinks shows a forum's Atom and RSS feed links below its
-description ("Subscribe to the feed: Atom or RSS"), as phpBB.com does by
-hand in its forum descriptions.
+description ("Subscribe to the feed, available in Atom or RSS format."),
+as phpBB.com does by hand in its forum descriptions.
 
 The existing events in the row do not fit:
 - forumlist_body_forum_image_before/prepend/append/after sit before the

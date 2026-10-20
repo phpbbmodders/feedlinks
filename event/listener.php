@@ -88,12 +88,14 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Tell the page head whether to add RSS links for the board-wide feeds
+	 * Tell the page head whether to add RSS links for the board-wide feeds,
+	 * and load the language its RSS links use
 	 *
 	 * @return void
 	 */
 	public function add_rss_head_switch()
 	{
+		$this->load_language();
 		$this->template->assign_var('S_FEEDLINKS_RSS_HEAD', (bool) $this->config['feedlinks_rss_head']);
 	}
 
@@ -101,8 +103,7 @@ class listener implements EventSubscriberInterface
 	 * Add a forum's feed links below its description on forum lists
 	 *
 	 * phpBB has no template event after the description of a forum row (see
-	 * docs/events/), so the rendered links are appended to FORUM_DESC. The
-	 * URLs are also given to the row for styles that place them elsewhere.
+	 * docs/events/), so the rendered links are appended to FORUM_DESC.
 	 *
 	 * @param data $event
 	 * @return void
@@ -117,8 +118,6 @@ class listener implements EventSubscriberInterface
 		}
 
 		$forum_row = $event['forum_row'];
-		$forum_row['U_FEEDLINKS_ATOM'] = $urls['atom'];
-		$forum_row['U_FEEDLINKS_RSS'] = $urls['rss'];
 		$forum_row['FORUM_DESC'] .= $this->render_links($urls, $event['row']['forum_name'], true, $forum_row['FORUM_DESC'] !== '');
 		$event['forum_row'] = $forum_row;
 	}
@@ -139,7 +138,6 @@ class listener implements EventSubscriberInterface
 		}
 
 		$this->template->assign_vars([
-			'U_FEEDLINKS_ATOM'		=> $urls['atom'],
 			'U_FEEDLINKS_RSS'		=> $urls['rss'],
 			'FEEDLINKS_FORUM_LINKS'	=> $this->render_links($urls, $event['forum_data']['forum_name'], false),
 		]);
@@ -193,7 +191,7 @@ class listener implements EventSubscriberInterface
 		if ($event['action'] === 'add' && !$event['update'])
 		{
 			$forum_data = $event['forum_data'];
-			$forum_data['forum_feedlinks'] = 0;
+			$forum_data['forum_feedlinks'] = links::NONE;
 			$event['forum_data'] = $forum_data;
 		}
 	}
@@ -208,9 +206,9 @@ class listener implements EventSubscriberInterface
 	{
 		$this->language->add_lang('acp_feedlinks', 'phpbbmodders/feedlinks');
 
-		$current = isset($event['forum_data']['forum_feedlinks']) ? (int) $event['forum_data']['forum_feedlinks'] : 0;
+		$current = isset($event['forum_data']['forum_feedlinks']) ? (int) $event['forum_data']['forum_feedlinks'] : links::NONE;
 		$options = [
-			0				=> 'FEEDLINKS_NONE',
+			links::NONE		=> 'FEEDLINKS_NONE',
 			links::ATOM		=> 'FEEDLINKS_ATOM',
 			links::RSS		=> 'FEEDLINKS_RSS',
 			links::BOTH		=> 'FEEDLINKS_BOTH',
@@ -266,11 +264,7 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function render_links(array $urls, $forum_name, $in_list, $new_line = false)
 	{
-		if (!$this->language_loaded)
-		{
-			$this->language->add_lang('feedlinks', 'phpbbmodders/feedlinks');
-			$this->language_loaded = true;
-		}
+		$this->load_language();
 
 		return $this->twig->render(self::LINKS_TEMPLATE, [
 			'U_ATOM'		=> $urls['atom'],
@@ -279,5 +273,19 @@ class listener implements EventSubscriberInterface
 			'S_IN_LIST'		=> $in_list,
 			'S_NEW_LINE'	=> $new_line,
 		]);
+	}
+
+	/**
+	 * Load the front-end language file once
+	 *
+	 * @return void
+	 */
+	protected function load_language()
+	{
+		if (!$this->language_loaded)
+		{
+			$this->language->add_lang('feedlinks', 'phpbbmodders/feedlinks');
+			$this->language_loaded = true;
+		}
 	}
 }
