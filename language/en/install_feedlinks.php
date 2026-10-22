@@ -22,5 +22,5 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, [
-	'FEEDLINKS_NOT_ENABLEABLE'	=> 'Feed Links could not be enabled. It needs phpBB 3.3.19 or later, PHP 7.4.0 or later, and the PHP DOM extension.',
+	'FEEDLINKS_NOT_ENABLEABLE'	=> 'Feed Links could not be enabled. It needs phpBB 3.3.19 or later, PHP 8.3.36 or later, and the PHP DOM extension.',
 ]);
