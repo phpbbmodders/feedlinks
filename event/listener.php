@@ -52,6 +52,9 @@ class listener implements EventSubscriberInterface
 	/** @var bool Whether the front-end language file is loaded */
 	protected $language_loaded = false;
 
+	/** @var bool|null Whether the user's style has the forumlist_body_forum_desc_after event, once looked up */
+	protected $forumlist_event;
+
 	/**
 	 * @param config $config
 	 * @param language $language
@@ -102,8 +105,11 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Add a forum's feed links below its description on forum lists
 	 *
-	 * phpBB has no template event after the description of a forum row (see
-	 * docs/events/), so the rendered links are appended to FORUM_DESC.
+	 * Styles with the forumlist_body_forum_desc_after template event (phpBB
+	 * 3.3.20 and 4.0 Prosilver, or a style that adds it) get the links in
+	 * their own forumrow variable, shown by that event. Older styles have no
+	 * place after the description, so there the links are appended to
+	 * FORUM_DESC as before.
 	 *
 	 * @param data $event
 	 * @return void
@@ -118,8 +124,48 @@ class listener implements EventSubscriberInterface
 		}
 
 		$forum_row = $event['forum_row'];
-		$forum_row['FORUM_DESC'] .= $this->render_links($urls, $event['row']['forum_name'], true, $forum_row['FORUM_DESC'] !== '');
+
+		if ($this->style_has_forumlist_event())
+		{
+			$forum_row['FEEDLINKS_FORUMLIST_LINKS'] = $this->render_links($urls, $event['row']['forum_name'], true, true);
+		}
+		else
+		{
+			$forum_row['FORUM_DESC'] .= $this->render_links($urls, $event['row']['forum_name'], true, $forum_row['FORUM_DESC'] !== '');
+		}
+
 		$event['forum_row'] = $forum_row;
+	}
+
+	/**
+	 * Whether the forum list template of the user's style has the
+	 * forumlist_body_forum_desc_after event
+	 *
+	 * Looks at the first forumlist_body.html in the style and its parents,
+	 * the one phpBB uses, once per request.
+	 *
+	 * @return bool
+	 */
+	protected function style_has_forumlist_event()
+	{
+		if ($this->forumlist_event === null)
+		{
+			$this->forumlist_event = false;
+			$root = $this->twig->get_phpbb_root_path();
+
+			foreach ($this->template->get_user_style() as $style)
+			{
+				$file = $root . 'styles/' . $style . '/template/forumlist_body.html';
+
+				if (is_file($file))
+				{
+					$this->forumlist_event = strpos((string) file_get_contents($file), 'forumlist_body_forum_desc_after') !== false;
+					break;
+				}
+			}
+		}
+
+		return $this->forumlist_event;
 	}
 
 	/**

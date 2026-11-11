@@ -1,3 +1,13 @@
+STATUS
+======
+Filed:  https://tracker.phpbb.com/browse/PHPBB-17748
+Merged: https://github.com/phpbb/phpbb/pull/7095 (3.3.x) and
+        https://github.com/phpbb/phpbb/pull/7096 (master), 11/03/2026
+Since:  3.3.20-RC1
+Feed Links uses the event when the user's style has it, and falls back to
+appending to FORUM_DESC for styles without it (phpBB 3.3.19 Prosilver and
+older custom styles).
+
 PROJECT: phpBB (PHPBB)
 ISSUE TYPE: Improvement
 SUMMARY: New template event forumlist_body_forum_desc_after

@@ -26,8 +26,11 @@ class listener_test extends \phpbb_test_case
 	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\template\template */
 	protected $template;
 
-	/** @var \PHPUnit\Framework\MockObject\MockObject|\Twig\Environment */
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\template\twig\environment */
 	protected $twig;
+
+	/** @var string A throwaway board root holding the styles a test needs */
+	protected $style_root = '';
 
 	/** @var \PHPUnit\Framework\MockObject\MockObject|links */
 	protected $links;
@@ -44,9 +47,55 @@ class listener_test extends \phpbb_test_case
 
 		$this->request = $this->getMockBuilder('\phpbb\request\request_interface')->getMock();
 		$this->template = $this->getMockBuilder('\phpbb\template\template')->getMock();
-		$this->twig = $this->getMockBuilder('\Twig\Environment')->disableOriginalConstructor()->getMock();
+		$this->twig = $this->getMockBuilder('\phpbb\template\twig\environment')->disableOriginalConstructor()->getMock();
 		$this->links = $this->getMockBuilder(links::class)->disableOriginalConstructor()->getMock();
 		$this->config = new config(['feed_topic' => 1, 'feedlinks_rss_head' => 1]);
+	}
+
+	protected function tearDown(): void
+	{
+		if ($this->style_root !== '')
+		{
+			foreach (glob($this->style_root . 'styles/*/template/forumlist_body.html') as $file)
+			{
+				unlink($file);
+				rmdir(dirname($file));
+				rmdir(dirname($file, 2));
+			}
+			foreach (glob($this->style_root . 'styles/*', GLOB_ONLYDIR) as $dir)
+			{
+				rmdir($dir);
+			}
+			rmdir($this->style_root . 'styles');
+			rmdir($this->style_root);
+		}
+
+		parent::tearDown();
+	}
+
+	/**
+	 * Give the user a style tree, and a forumlist_body.html to the styles named
+	 * in $templates (style name => whether it has the forumlist_body_forum_desc_after event)
+	 *
+	 * @param array $tree Style names, the user's style first, then its parents
+	 * @param array $templates
+	 * @return void
+	 */
+	protected function set_styles(array $tree, array $templates)
+	{
+		$this->style_root = sys_get_temp_dir() . '/feedlinks_test_' . uniqid() . '/';
+		foreach ($tree as $style)
+		{
+			mkdir($this->style_root . 'styles/' . $style, 0777, true);
+		}
+		foreach ($templates as $style => $has_event)
+		{
+			mkdir($this->style_root . 'styles/' . $style . '/template');
+			file_put_contents($this->style_root . 'styles/' . $style . '/template/forumlist_body.html',
+				'<a class="forumtitle"></a>' . ($has_event ? '{% EVENT forumlist_body_forum_desc_after %}' : ''));
+		}
+		$this->twig->method('get_phpbb_root_path')->willReturn($this->style_root);
+		$this->template->method('get_user_style')->willReturn($tree);
 	}
 
 	/**
@@ -103,6 +152,7 @@ class listener_test extends \phpbb_test_case
 
 	public function test_forumlist_links()
 	{
+		$this->set_styles(['prosilver'], ['prosilver' => false]);
 		$this->links->method('get_urls')->willReturn(['atom' => 'atom-url', 'rss' => '']);
 		$this->twig->expects($this->once())
 			->method('render')
@@ -122,6 +172,39 @@ class listener_test extends \phpbb_test_case
 		$this->get_listener()->add_forumlist_links($event);
 
 		$this->assertSame(['FORUM_DESC' => 'Description<links>'], $event['forum_row']);
+	}
+
+	/**
+	 * Styles with the forumlist_body_forum_desc_after event, directly or from
+	 * a parent style, get the links in their own forumrow variable
+	 */
+	public static function forumlist_event_styles()
+	{
+		return [
+			'the style has the event'				=> [['prosilver'], ['prosilver' => true]],
+			'a child style inherits it'				=> [['child', 'prosilver'], ['prosilver' => true]],
+			'the child overrides it without the event'	=> [['child', 'prosilver'], ['child' => false, 'prosilver' => true]],
+		];
+	}
+
+	/** @dataProvider forumlist_event_styles */
+	public function test_forumlist_links_with_event(array $tree, array $templates)
+	{
+		$this->set_styles($tree, $templates);
+		$uses_event = $templates[array_values(array_filter($tree, function ($s) use ($templates) { return isset($templates[$s]); }))[0]];
+		$this->links->method('get_urls')->willReturn(['atom' => 'atom-url', 'rss' => 'rss-url']);
+		$this->twig->method('render')->willReturn('<links>');
+
+		$event = new data([
+			'row'		=> ['forum_name' => 'Forum'],
+			'forum_row'	=> ['FORUM_DESC' => 'Description'],
+		]);
+		$this->get_listener()->add_forumlist_links($event);
+
+		$expected = $uses_event
+			? ['FORUM_DESC' => 'Description', 'FEEDLINKS_FORUMLIST_LINKS' => '<links>']
+			: ['FORUM_DESC' => 'Description<links>'];
+		$this->assertSame($expected, $event['forum_row']);
 	}
 
 	public function test_forumlist_without_links()
