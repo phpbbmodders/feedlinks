@@ -49,7 +49,7 @@ class listener_test extends \phpbb_test_case
 		$this->template = $this->getMockBuilder('\phpbb\template\template')->getMock();
 		$this->twig = $this->getMockBuilder('\phpbb\template\twig\environment')->disableOriginalConstructor()->getMock();
 		$this->links = $this->getMockBuilder(links::class)->disableOriginalConstructor()->getMock();
-		$this->config = new config(['feed_topic' => 1, 'feedlinks_rss_head' => 1]);
+		$this->config = new config(['feed_topic' => 1, 'feedlinks_rss_head' => 1, 'feedlinks_show_list' => 1, 'feedlinks_show_forum' => 1]);
 	}
 
 	protected function tearDown(): void
@@ -221,6 +221,60 @@ class listener_test extends \phpbb_test_case
 		$this->assertSame(['FORUM_DESC' => 'Description'], $event['forum_row']);
 	}
 
+	public function test_forumlist_links_switched_off()
+	{
+		$this->config['feedlinks_show_list'] = 0;
+		$this->links->expects($this->never())->method('get_urls');
+		$this->twig->expects($this->never())->method('render');
+
+		$event = new data([
+			'row'		=> ['forum_name' => 'Forum'],
+			'forum_row'	=> ['FORUM_DESC' => 'Description'],
+		]);
+		$this->get_listener()->add_forumlist_links($event);
+
+		$this->assertSame(['FORUM_DESC' => 'Description'], $event['forum_row']);
+	}
+
+	public function test_viewforum_links()
+	{
+		$this->links->method('get_urls')->willReturn(['atom' => 'atom-url', 'rss' => 'rss-url']);
+		$this->twig->expects($this->once())
+			->method('render')
+			->with(listener::LINKS_TEMPLATE, [
+				'U_ATOM'		=> 'atom-url',
+				'U_RSS'			=> 'rss-url',
+				'FORUM_NAME'	=> 'Forum',
+				'S_IN_LIST'		=> false,
+				'S_NEW_LINE'	=> false,
+			])
+			->willReturn('<links>');
+		$assigned = $this->record_calls('assign_var');
+
+		$this->get_listener()->add_viewforum_links(new data(['forum_data' => ['forum_name' => 'Forum']]));
+
+		$this->assertSame([
+			['U_FEEDLINKS_RSS', 'rss-url'],
+			['FEEDLINKS_FORUM_LINKS', '<links>'],
+		], $assigned->getArrayCopy());
+	}
+
+	/**
+	 * With the forum page setting off the page still gets its RSS link for
+	 * the head, but not the visible links
+	 */
+	public function test_viewforum_links_switched_off()
+	{
+		$this->config['feedlinks_show_forum'] = 0;
+		$this->links->method('get_urls')->willReturn(['atom' => 'atom-url', 'rss' => 'rss-url']);
+		$this->twig->expects($this->never())->method('render');
+		$assigned = $this->record_calls('assign_var');
+
+		$this->get_listener()->add_viewforum_links(new data(['forum_data' => ['forum_name' => 'Forum']]));
+
+		$this->assertSame([['U_FEEDLINKS_RSS', 'rss-url']], $assigned->getArrayCopy());
+	}
+
 	public function test_viewtopic_head_links()
 	{
 		$this->links->method('get_urls')->willReturn(['atom' => 'atom-url', 'rss' => 'forum-rss']);
@@ -312,6 +366,8 @@ class listener_test extends \phpbb_test_case
 			'feed_exclude_id',
 			'legend_feedlinks',
 			'feedlinks_rss_head',
+			'feedlinks_show_list',
+			'feedlinks_show_forum',
 			'legend5',
 		], array_keys($event['display_vars']['vars']));
 

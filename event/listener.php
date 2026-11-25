@@ -23,7 +23,7 @@ use Twig\Environment;
  * Feed Links event listener
  *
  * Adds the per-forum setting to ACP > Forums, the board-wide RSS discovery
- * setting to ACP > Feed settings, and the feed links to the board index,
+ * and link placement settings to ACP > Feed settings, and the feed links to the board index,
  * forum pages and page head.
  */
 class listener implements EventSubscriberInterface
@@ -103,7 +103,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add a forum's feed links below its description on forum lists
+	 * Add a forum's feed links below its description on forum lists, unless
+	 * the Show links in forum lists setting is off
 	 *
 	 * Styles with the forumlist_body_forum_desc_after template event (phpBB
 	 * 3.3.20 and 4.0 Prosilver, or a style that adds it) get the links in
@@ -116,6 +117,11 @@ class listener implements EventSubscriberInterface
 	 */
 	public function add_forumlist_links(data $event)
 	{
+		if (!$this->config['feedlinks_show_list'])
+		{
+			return;
+		}
+
 		$urls = $this->links->get_urls($event['row']);
 
 		if ($urls['atom'] === '' && $urls['rss'] === '')
@@ -169,7 +175,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add a forum's feed links to its own page, and its RSS link to the head
+	 * Add a forum's feed links to its own page, unless the Show links on the
+	 * forum page setting is off, and its RSS link to the head
 	 *
 	 * @param data $event
 	 * @return void
@@ -183,10 +190,12 @@ class listener implements EventSubscriberInterface
 			return;
 		}
 
-		$this->template->assign_vars([
-			'U_FEEDLINKS_RSS'		=> $urls['rss'],
-			'FEEDLINKS_FORUM_LINKS'	=> $this->render_links($urls, $event['forum_data']['forum_name'], false),
-		]);
+		$this->template->assign_var('U_FEEDLINKS_RSS', $urls['rss']);
+
+		if ($this->config['feedlinks_show_forum'])
+		{
+			$this->template->assign_var('FEEDLINKS_FORUM_LINKS', $this->render_links($urls, $event['forum_data']['forum_name'], false));
+		}
 	}
 
 	/**
@@ -290,6 +299,18 @@ class listener implements EventSubscriberInterface
 			'legend_feedlinks'		=> 'FEEDLINKS_LEGEND',
 			'feedlinks_rss_head'	=> [
 				'lang'		=> 'FEEDLINKS_RSS_HEAD',
+				'validate'	=> 'bool',
+				'type'		=> 'radio:yes_no',
+				'explain'	=> true,
+			],
+			'feedlinks_show_list'	=> [
+				'lang'		=> 'FEEDLINKS_SHOW_LIST',
+				'validate'	=> 'bool',
+				'type'		=> 'radio:yes_no',
+				'explain'	=> true,
+			],
+			'feedlinks_show_forum'	=> [
+				'lang'		=> 'FEEDLINKS_SHOW_FORUM',
 				'validate'	=> 'bool',
 				'type'		=> 'radio:yes_no',
 				'explain'	=> true,
