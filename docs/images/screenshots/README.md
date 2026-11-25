@@ -28,6 +28,6 @@ The board index at phone width.
 
 ## ACP: feed settings
 
-The extension's section at the end of **ACP → Feed settings**.
+The extension's section at the end of **ACP → Feed settings**: the RSS discovery links, and whether the feed links show in forum lists and on the forum page.
 
-[<img src="feedlinks-acp-feed.png" width="700" alt="The RSS discovery links setting">](feedlinks-acp-feed.png)
+[<img src="feedlinks-acp-feed.png" width="700" alt="The RSS discovery links and feed link placement settings">](feedlinks-acp-feed.png)
